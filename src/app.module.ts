@@ -3,6 +3,9 @@ import { CartModule } from './cart/cart.module';
 import { HttpExceptionFilter } from './filter/http-exception-filter';
 import { APP_FILTER } from '@nestjs/core';
 import { PaymentModule } from './payment/payment.module';
+import { InternalMessageQueueModule } from './internal-message-queue/internal-message-queue.module';
+import configuration from '../config/configuration';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   providers: [
@@ -11,6 +14,15 @@ import { PaymentModule } from './payment/payment.module';
       useClass: HttpExceptionFilter,
     },
   ],
-  imports: [CartModule, PaymentModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+      cache: true,
+    }),
+    CartModule,
+    PaymentModule,
+    InternalMessageQueueModule,
+  ],
 })
 export class AppModule {}
