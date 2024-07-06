@@ -1,8 +1,15 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
 import { CartService } from './cart.service';
 
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import CreatePaymentRequestDto from './dto/create-payment-request.dto';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import CreateInvoiceRequestDto from './dto/create-invoice-request.dto';
+import CreateInvoiceResponseDto from './dto/create-invoice-response.dto';
 
 @ApiBearerAuth()
 @ApiTags('cart')
@@ -10,9 +17,17 @@ import CreatePaymentRequestDto from './dto/create-payment-request.dto';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @ApiBody({ type: CreatePaymentRequestDto, required: true })
+  @ApiOperation({
+    summary: 'Create an customer invoice based on shopping cart items',
+    description: 'Will return an unpaid invoice',
+  })
+  @ApiBody({ type: CreateInvoiceRequestDto, required: true })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: CreateInvoiceResponseDto,
+  })
   @Post()
-  create(@Body() createPaymentRequestDto: CreatePaymentRequestDto) {
-    return this.cartService.create(createPaymentRequestDto);
+  async create(@Body() createPaymentRequestDto: CreateInvoiceRequestDto) {
+    return await this.cartService.create(createPaymentRequestDto);
   }
 }
